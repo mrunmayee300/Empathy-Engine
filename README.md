@@ -182,77 +182,193 @@ POST /speak
 
 ---
 
-## Design Choices and Emotion-to-Voice Mapping
-1. Emotion Detection
+## Working of the Project
 
-The system uses VADER sentiment analysis to extract a compound score between -1 and +1. This score is used to determine both:
-
-Emotion category (happy, frustrated, neutral, etc.)
-Intensity of the emotion
-2. Emotion Classification Logic
-Positive score → Happy
-Negative score → Frustrated
-Near zero → Neutral
-High magnitude → Surprised
-Presence of question mark → Inquisitive
-
-This allows the system to go beyond basic sentiment and capture more nuanced emotional states.
-
-3. Voice Parameter Modulation
-
-The system modifies two main parameters:
-
-Rate (speech speed)
-Volume (loudness)
-
-Mapping:
-
-Happy:
-Higher rate
-Higher volume
-→ Creates energetic and engaging tone
-Frustrated:
-Lower rate
-Lower volume
-→ Produces slower, heavier speech
-Neutral:
-Default rate and volume
-→ Maintains standard delivery
-Surprised:
-Very high rate
-Medium volume
-→ Adds urgency and variation
-Inquisitive:
-Slightly higher rate
-Medium volume
-→ Creates a questioning tone
-4. Intensity Scaling
-
-The compound sentiment score controls how strongly the parameters are adjusted.
-
-Example:
-
-Low score (0.2) → small changes
-High score (0.9) → large changes
-
-This ensures emotion is continuous rather than binary.
-
-5. Text Enhancement (SSML-like Simulation)
-
-Since pyttsx3 has limited emotional control, the system enhances text before speech generation:
-
-Adds pauses using punctuation (e.g., "..." )
-Emphasizes important words
-Modifies sentence structure
-
-This improves expressiveness even with a basic TTS engine.
-
-6. Why This Approach
-pyttsx3 allows offline execution and fast prototyping
-VADER is lightweight and effective for short text
-Combining parameter modulation with text enhancement compensates for TTS limitations
-
-This design balances simplicity, performance, and expressive output.
+The Empathy Engine follows a structured pipeline that transforms input text into emotionally expressive speech. The process consists of four main stages:
 
 ---
 
+### 1. Text Input
+
+The system accepts user input through:
+
+* A **web interface** (textarea input), or
+* A **CLI command**
+
+This text acts as the raw input for emotion analysis and speech generation.
+
+---
+
+### 2. Emotion Detection
+
+The input text is processed using **VADER sentiment analysis**, which computes a **compound score** ranging from -1 (very negative) to +1 (very positive).
+
+Based on this score and simple rules:
+
+* The system determines the **emotion category** (happy, frustrated, neutral, surprised, inquisitive)
+* It also extracts the **intensity** of the emotion
+
+This step converts raw text into structured emotional information.
+
+---
+
+### 3. Text Enhancement (Preprocessing)
+
+Before generating speech, the text is modified to improve expressiveness. Since the TTS engine has limited emotional capability, this step simulates SSML-like behavior.
+
+Enhancements include:
+
+* Adding pauses using punctuation (e.g., `"..."`)
+* Emphasizing important words
+* Adjusting sentence structure based on emotion
+
+This prepares the text in a way that makes the output sound more natural.
+
+---
+
+### 4. Emotion-to-Voice Mapping
+
+The detected emotion and its intensity are mapped to speech parameters:
+
+* **Rate (speed of speech)**
+* **Volume (loudness)**
+
+Examples:
+
+* Happy → faster and louder speech
+* Frustrated → slower and softer speech
+* Neutral → default parameters
+
+The **intensity score** controls how strongly these parameters are adjusted.
+
+---
+
+### 5. Speech Generation
+
+The processed text and computed voice parameters are passed to the TTS engine (`pyttsx3`).
+
+The engine:
+
+* Applies the configured rate and volume
+* Converts text into speech
+* Saves the output as a `.wav` audio file
+
+---
+
+### 6. Output Delivery
+
+The generated audio is:
+
+* Saved in the `static/` folder
+* Played in the web interface using an audio player
+* Or returned via API/CLI
+
+---
+
+## Summary Flow
+
+Input Text
+→ Emotion Detection
+→ Text Enhancement
+→ Parameter Mapping
+→ Speech Generation
+→ Audio Output
+
+---
+
+This pipeline ensures that the system not only speaks text but delivers it with **context-aware emotional expression**, improving the overall user experience.
+
+
+## Design Choices and Emotion-to-Voice Mapping
+
+### 1. Emotion Detection
+
+The system uses **VADER sentiment analysis** to extract a compound score between **-1 and +1**. This score is used to determine:
+
+* Emotion category (happy, frustrated, neutral, etc.)
+* Intensity of the emotion
+
+---
+
+### 2. Emotion Classification Logic
+
+* Positive score → **Happy**
+* Negative score → **Frustrated**
+* Near zero → **Neutral**
+* High magnitude → **Surprised**
+* Presence of question mark → **Inquisitive**
+
+This approach allows the system to go beyond basic sentiment and capture more nuanced emotional states.
+
+---
+
+### 3. Voice Parameter Modulation
+
+The system modifies two main parameters:
+
+* **Rate** (speech speed)
+* **Volume** (loudness)
+
+#### Mapping Logic
+
+**Happy**
+
+* Higher rate
+* Higher volume
+  → Creates an energetic and engaging tone
+
+**Frustrated**
+
+* Lower rate
+* Lower volume
+  → Produces slower, heavier speech
+
+**Neutral**
+
+* Default rate and volume
+  → Maintains standard delivery
+
+**Surprised**
+
+* Very high rate
+* Medium volume
+  → Adds urgency and variation
+
+**Inquisitive**
+
+* Slightly higher rate
+* Medium volume
+  → Creates a questioning tone
+
+---
+
+### 4. Intensity Scaling
+
+The compound sentiment score controls how strongly the parameters are adjusted.
+
+* Low score (0.2) → Small changes
+* High score (0.9) → Large changes
+
+This ensures emotion is **continuous rather than binary**, making the output more natural.
+
+---
+
+### 5. Text Enhancement (SSML-like Simulation)
+
+Since `pyttsx3` has limited emotional control, the system enhances text before speech generation:
+
+* Adds pauses using punctuation (e.g., `"..."`)
+* Emphasizes important words
+* Modifies sentence structure for better delivery
+
+This significantly improves expressiveness even with a basic TTS engine.
+
+---
+
+### 6. Why This Approach
+
+* `pyttsx3` enables offline execution and fast prototyping
+* VADER is lightweight and effective for short conversational text
+* Combining parameter modulation with text enhancement compensates for TTS limitations
+
+This design balances **simplicity, performance, and expressive output**.
