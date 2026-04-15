@@ -182,7 +182,7 @@ POST /speak
 
 ---
 
-Design Choices and Emotion-to-Voice Mapping
+## Design Choices and Emotion-to-Voice Mapping
 1. Emotion Detection
 
 The system uses VADER sentiment analysis to extract a compound score between -1 and +1. This score is used to determine both:
