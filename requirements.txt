@@ -1,0 +1,5 @@
+fastapi
+uvicorn
+nltk
+pyttsx3
+jinja2

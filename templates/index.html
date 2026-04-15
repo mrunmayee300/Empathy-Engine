@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Empathy Engine</title>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 24px; max-width: 760px;">
+  <h1>Empathy Engine</h1>
+  <p>Convert text to emotionally expressive speech.</p>
+
+  <textarea id="text" rows="8" style="width: 100%;" placeholder="Type text here..."></textarea>
+  <br /><br />
+  <button id="generate">Generate Voice</button>
+
+  <p id="emotion" style="margin-top: 18px;">Emotion: -</p>
+  <audio id="player" controls style="width: 100%;"></audio>
+
+  <script>
+    const button = document.getElementById("generate");
+    const textInput = document.getElementById("text");
+    const emotionLine = document.getElementById("emotion");
+    const player = document.getElementById("player");
+
+    button.addEventListener("click", async () => {
+      const text = textInput.value.trim();
+      if (!text) return;
+      emotionLine.textContent = "Generating...";
+
+      try {
+        const response = await fetch("/speak", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text })
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.detail || "Failed to generate speech");
+        }
+
+        emotionLine.textContent = `Emotion: ${data.emotion} (${data.intensity})`;
+        player.muted = false;
+        player.volume = 1.0;
+        player.src = `/${data.audio_file}?t=${Date.now()}`;
+        player.load();
+        try {
+          await player.play();
+        } catch (playErr) {
+          emotionLine.textContent = `Emotion: ${data.emotion} (${data.intensity}) - Audio ready, press Play`;
+        }
+      } catch (err) {
+        emotionLine.textContent = `Error: ${err.message}`;
+      }
+    });
+  </script>
+</body>
+</html>
