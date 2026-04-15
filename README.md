@@ -169,28 +169,6 @@ POST /speak
 
 ---
 
-## Design Decisions
-
-### Why pyttsx3?
-
-* Works offline
-* Lightweight and easy to integrate
-* Suitable for rapid prototyping
-
----
-
-### Why VADER?
-
-* Fast and efficient sentiment analysis
-* Works well for short conversational text
-
----
-
-### Why Text Enhancement?
-
-Plain text lacks vocal cues. Preprocessing improves speech delivery and makes emotional differences more noticeable.
-
----
 
 ## Example Outputs
 
