@@ -2,9 +2,11 @@
 
 ## Overview
 
-The Empathy Engine is a text-to-speech system that enhances traditional voice output by incorporating emotion-aware modulation. It analyzes input text, detects the underlying sentiment, and dynamically adjusts speech parameters such as rate and volume to produce more natural and expressive audio.
+The Empathy Engine is an emotion-aware text-to-speech system that enhances traditional voice output by making it more expressive and human-like. It takes text as input, analyzes the underlying sentiment using VADER, and classifies it into emotions such as happy, frustrated, neutral, surprised, and inquisitive.
 
-The goal is to reduce the robotic nature of standard TTS systems and create a more human-like interaction experience.
+Based on the detected emotion and its intensity, the system dynamically adjusts speech parameters like rate (speed) and volume (loudness). It also applies text preprocessing techniques such as adding pauses and emphasizing key words to improve delivery.
+
+The result is a more natural and engaging audio output compared to standard monotonic TTS systems.
 
 ---
 
@@ -180,6 +182,77 @@ POST /speak
 
 ---
 
+Design Choices and Emotion-to-Voice Mapping
+1. Emotion Detection
+
+The system uses VADER sentiment analysis to extract a compound score between -1 and +1. This score is used to determine both:
+
+Emotion category (happy, frustrated, neutral, etc.)
+Intensity of the emotion
+2. Emotion Classification Logic
+Positive score → Happy
+Negative score → Frustrated
+Near zero → Neutral
+High magnitude → Surprised
+Presence of question mark → Inquisitive
+
+This allows the system to go beyond basic sentiment and capture more nuanced emotional states.
+
+3. Voice Parameter Modulation
+
+The system modifies two main parameters:
+
+Rate (speech speed)
+Volume (loudness)
+
+Mapping:
+
+Happy:
+Higher rate
+Higher volume
+→ Creates energetic and engaging tone
+Frustrated:
+Lower rate
+Lower volume
+→ Produces slower, heavier speech
+Neutral:
+Default rate and volume
+→ Maintains standard delivery
+Surprised:
+Very high rate
+Medium volume
+→ Adds urgency and variation
+Inquisitive:
+Slightly higher rate
+Medium volume
+→ Creates a questioning tone
+4. Intensity Scaling
+
+The compound sentiment score controls how strongly the parameters are adjusted.
+
+Example:
+
+Low score (0.2) → small changes
+High score (0.9) → large changes
+
+This ensures emotion is continuous rather than binary.
+
+5. Text Enhancement (SSML-like Simulation)
+
+Since pyttsx3 has limited emotional control, the system enhances text before speech generation:
+
+Adds pauses using punctuation (e.g., "..." )
+Emphasizes important words
+Modifies sentence structure
+
+This improves expressiveness even with a basic TTS engine.
+
+6. Why This Approach
+pyttsx3 allows offline execution and fast prototyping
+VADER is lightweight and effective for short text
+Combining parameter modulation with text enhancement compensates for TTS limitations
+
+This design balances simplicity, performance, and expressive output.
 
 ---
 
